@@ -1,5 +1,5 @@
 const express = require("express")
-const db = require("./database")
+const db = require("./config/database")
 const md5 = require("md5")
 const cookieParser = require("cookie-parser")
 const randomString = require("randomstring")
