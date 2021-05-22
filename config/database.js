@@ -1,10 +1,21 @@
-const Sequelize = require("sequelize");
-const db = new Sequelize({
-    dialect:"sqlite",
-    storage: "test1.sqlite3",
-})
+const Sequelize = require('sequelize');
+const sequelize = new Sequelize({
+    dialect: "sqlite",
+    storage: "testERM.sqlite",
+    define: {
+        underscored: true
+    }
+});
 
-module.exports = db
+const db = {};
+
+db.Sequelize = Sequelize;
+db.sequelize = sequelize;
+
+//Models/tables
+db.users = require('../models/user.js')(sequelize, Sequelize);
+
+module.exports = db;
 
 // const sqlite3 = require("sqlite3").verbose();
 // const md5 = require("md5");
