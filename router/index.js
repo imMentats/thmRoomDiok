@@ -1,5 +1,6 @@
 const routes = [
-    require('./routes/users')
+    require('./routes/users'),
+    require('./routes/notes')
 ];
 
 module.exports = function router(app, db) {

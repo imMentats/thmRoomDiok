@@ -15,7 +15,7 @@ app.use(bodyParser.json())
 
 router(app,db)
 
-db.sequelize.sync().then(() => {
+db.sequelize.sync({force:true}).then(() => {
     app.listen(PORT, () => {
         console.log(`app started on port ${PORT}`)
     })

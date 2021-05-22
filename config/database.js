@@ -14,6 +14,7 @@ db.sequelize = sequelize;
 
 //Models/tables
 db.users = require('../models/user.js')(sequelize, Sequelize);
+db.notes = require('../models/note.js')(sequelize, Sequelize);
 
 module.exports = db;
 

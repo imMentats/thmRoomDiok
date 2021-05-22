@@ -2,12 +2,11 @@
 const md5 = require("md5");
 
 module.exports = (app, db) => {
-    // GET all users
-    app.get('/users', (req, res) => {
-        db.users.findAll({
+    app.get('/notes', (req, res) => {
+        db.notes.findAll({
         })
-            .then(users => {
-                res.json(users);
+            .then(notes => {
+                res.json(notes);
             })
         .catch(err => {
             res.json({
@@ -16,26 +15,15 @@ module.exports = (app, db) => {
         })
     });
 
-    // GET one user by id
-    app.get('/user/:id', (req, res) => {
-        const id = req.params.id;
-        db.users.find({
-            where: { id: id }
-        })
-            .then(user => {
-                res.json(user);
-            });
-    });
-
     // POST single user
-    app.post('/register', (req, res) => {
+    app.post('/note', (req, res) => {
         console.log(req.body)
-        const userData = {
-         name: req.body.name,
-            email: req.body.email,
-            password: md5(req.body.password),
+        const noteData = {
+         title: req.body.title,
+            content: req.body.content,
+            css: req.body.css,
         }
-        db.users.create(userData)
+        db.notes.create(noteData)
             .then(newUser => {
                 res.json(newUser);
             })
