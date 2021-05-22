@@ -17,15 +17,13 @@ module.exports = (app, db) => {
 
     // POST single user
     app.post('/note', (req, res) => {
-        console.log(req.body)
+
+        let isHacking = false;
+
         const noteData = {
          title: req.body.title,
             content: req.body.content,
             css: req.body.css,
-        }
-        db.notes.create(noteData)
-            .then(newUser => {
-                res.json(newUser);
-            })
+        };
     });
 };
