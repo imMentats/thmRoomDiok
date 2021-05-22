@@ -13,6 +13,7 @@ const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(bodyParser.json())
+app.use(express.static("./frontend"))
 
 router(app, db)
 

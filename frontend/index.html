@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="style/main.css">
+    <link rel="stylesheet" href="./lib/css/bootstrap.min.css">
+    <title>Document</title>
+</head>
+<body>
+<div class="container greetings">
+    <div class="row">
+        <h1>
+            Welcome to aaaaaa
+        </h1>
+        <p>On this website you can upload simple dev-notes for the company projects. We know that programmers likes
+            colours,
+            so as a little cool feature it is possible to apply a custom CSS to the note.
+        </p>
+    </div>
+</div>
+<div class="container container__notes">
+    <div id="notes" class="row d-flex justify-content-center">
+    </div>
+</div>
+<link href="./scripts/app2.js">
+
+<script src="scripts/app.js"></script>
+<script src="lib/js/bootstrap.min.js"></script>
+<script src="lib/js/bootstrap.bundle.js"></script>
+<script>
+    const notesContainer = document.getElementById("notes");
+
+    const render = (state) => {
+        state.forEach(el => {
+            notesContainer.innerHTML +=
+                `
+                <\div id="note--${el.id}" class="note col-12 col-md-5 m-1 p-4">
+                    <\h1\>${el.title}</\h1>
+                    <\p\>${el.content}</\p>
+                    <style>
+                        #note--${el.id} {
+                        ${el.css}
+                        }
+                    </style>
+                </\div>
+                `
+        })
+    }
+    const XHR = new XMLHttpRequest();
+    let apiServer = "http://127.0.0.1:3010"
+    XHR.open("GET", `${apiServer}/notes`, false);
+    try {
+        XHR.send();
+        if (XHR.status !== 200) {
+            alert("Error retrieving notes.")
+        } else {
+            let notes = JSON.parse(XHR.response)
+            render(notes);
+        }
+    } catch (err) {
+        alert(err)
+    }
+</script>
+</body>
+</html>

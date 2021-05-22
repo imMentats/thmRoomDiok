@@ -1,0 +1,18 @@
+html,
+body {
+    background: #002b36 !important;
+}
+
+b {
+    color: #eee8d5;
+}
+
+.greetings {
+    color: #93a1a1;
+}
+
+.note {
+    background: #073642;
+    color: #93a1a1;
+    min-height: 250px;
+}
