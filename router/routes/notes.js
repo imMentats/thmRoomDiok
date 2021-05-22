@@ -19,7 +19,7 @@ module.exports = (app, db) => {
     // GET one user by id
     app.get('/user/:id', (req, res) => {
         const id = req.params.id;
-        db.users.findOne({
+        db.users.find({
             where: { id: id }
         })
             .then(user => {
