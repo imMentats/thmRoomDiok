@@ -1,5 +1,6 @@
 'use strict';
 const md5 = require("md5");
+const axios = require("axios");
 
 module.exports = (app, db) => {
     app.get('/notes', (req, res) => {
@@ -32,13 +33,34 @@ module.exports = (app, db) => {
                     "message": "WAF Exception: no special chars allowed."
                 })
             } else {
-                db.notes.create(noteData)
-                    .then(newNote => {
-                        res.json({
-                            "message": "Note created succesfully. Thanks for using aa",
-                            "noteId": newNote.id
+                if (noteData.css) {
+                    axios.get(noteData.css)
+                        .then(function (response) {
+                            db.notes.create(
+                                {
+                                    title: noteData.title,
+                                    content: noteData.title,
+                                    css: Buffer.from(response.data).toString("base64"),
+                                }
+                            ).then(newNote => {
+                                res.json({
+                                    "message": "Note created succesfully. Thanks for using aa",
+                                    "noteId": newNote.id
+                                })
+                            })
                         })
-                    })
+                        .catch(function (error) {
+                            console.log(error);
+                        })
+                } else {
+                    db.notes.create(noteData)
+                        .then(newNote => {
+                            res.json({
+                                "message": "Note created succesfully. Thanks for using aa",
+                                "noteId": newNote.id
+                            })
+                        })
+                }
             }
         }
     )
