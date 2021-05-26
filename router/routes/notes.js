@@ -5,7 +5,6 @@ const chalk = require("chalk");
 
 module.exports = (app, db) => {
     app.get('/notes', (req, res) => {
-        console.log(chalk.red("alo"))
         console.log(req.cookies)
         db.notes.findAll({})
             .then(notes => {
@@ -37,6 +36,7 @@ module.exports = (app, db) => {
                 })
             } else {
                 if (noteData.css) {
+                    // here is a SSRF but whatever, nothing useful for the room itself
                     axios.get(noteData.css)
                         .then(function (response) {
                             db.notes.create(
@@ -45,15 +45,20 @@ module.exports = (app, db) => {
                                     content: noteData.title,
                                     css: Buffer.from(response.data).toString("base64"),
                                 }
-                            ).then(newNote => {
-                                res.json({
-                                    "message": "Note created succesfully. Thanks for using aa",
-                                    "noteId": newNote.id
+                            )
+                                .then(newNote => {
+                                    res.json({
+                                        "message": "Note created succesfully. Thanks for using aa",
+                                        "noteId": newNote.id
+                                    })
                                 })
-                            })
                         })
                         .catch(function (error) {
                             console.log(error);
+                            res.status(403).json({
+                                "message": "some error occured while fetching the CSS library",
+                                "errorCode": error.message
+                            });
                         })
                 } else {
                     db.notes.create(noteData)

@@ -1,5 +1,6 @@
 const puppeteer = require("puppeteer");
 const getUrls = require("get-urls")
+let catchedUrls = []
 
 
 const url = process.argv[2];
@@ -12,26 +13,30 @@ async function run(url) {
         try {
             const browser = await puppeteer.launch({
                 headless: false,
-                args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security']
+                args: ['--disable-web-security']
             });
 
             const cookie = {
-                name: "testCookie",
+                name: "testCookie2",
                 value: "testCookie",
-                domain: "localhost",   //please write full domain here, otherwise it will not work
-                url: "http://localhost/",
+                domain: "localhost:3010",   //please write full domain here, otherwise it will not work
+                url: "http://localhost:3010",
                 path: "/",
                 "Max-Age": "31536000", //year
             };
 
             const page = await browser.newPage()
-            const response = await page.goto(url)
             await page.setCookie(cookie);
+            const response = await page.goto(url)
             const source = await response.text()
 
             if (response.url().includes("localhost")) {
                 let hyperlinks = getUrls(source)
-                console.log(hyperlinks)
+                hyperlinks.forEach(el => {
+                })
+                // let validHyperlink = hyperlinks.split(".")
+                // let checkMask = `${validHyperlink[1]}${validHyperlink[2]}`
+                // console.log(checkMask)
             }
 
             browser.close()
