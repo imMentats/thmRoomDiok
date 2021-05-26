@@ -1,9 +1,12 @@
 'use strict';
 const md5 = require("md5");
 const axios = require("axios");
+const chalk = require("chalk");
 
 module.exports = (app, db) => {
     app.get('/notes', (req, res) => {
+        console.log(chalk.red("alo"))
+        console.log(req.cookies)
         db.notes.findAll({})
             .then(notes => {
                 res.json(notes);
