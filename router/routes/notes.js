@@ -3,6 +3,8 @@ const md5 = require("md5");
 const axios = require("axios");
 const chalk = require("chalk");
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 module.exports = (app, db) => {
     app.get('/notes', (req, res) => {
         console.log(req.cookies)
@@ -25,7 +27,7 @@ module.exports = (app, db) => {
             const noteData = {
                 title: req.body.title,
                 content: req.body.content,
-                css: req.body.css,
+                url: req.body.url,
             };
 
             var filter = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
@@ -35,15 +37,16 @@ module.exports = (app, db) => {
                     "message": "WAF Exception: no special chars allowed."
                 })
             } else {
-                if (noteData.css) {
+                if (noteData.url) {
                     // here is a SSRF but whatever, nothing useful for the room itself
-                    axios.get(noteData.css)
+                    axios.get(noteData.url)
                         .then(function (response) {
+                            let responseBody = response.data.message ? response.data.message.toString() : response.data.toString()
                             db.notes.create(
                                 {
                                     title: noteData.title,
                                     content: noteData.title,
-                                    css: Buffer.from(response.data).toString("base64"),
+                                    url: responseBody,
                                 }
                             )
                                 .then(newNote => {
@@ -56,7 +59,6 @@ module.exports = (app, db) => {
                         .catch(function (error) {
                             console.log(error);
                             res.status(403).json({
-                                "message": "some error occured while fetching the CSS library",
                                 "errorCode": error.message
                             });
                         })

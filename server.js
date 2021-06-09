@@ -10,6 +10,8 @@ const puppeteer = require("puppeteer")
 const app = express()
 const PORT = 3010
 
+let messageService = true
+
 const bodyParser = require("body-parser")
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
@@ -22,9 +24,35 @@ app.get("/", (req, res) => {
     res.sendFile(path.join(__dirname, "/frontend/index.html"))
 })
 
-db.sequelize.sync({force: true}).then(() => {
+app.get("/chat", (req, res) => {
+    res.sendFile(path.join(__dirname, "/frontend/chat.html"))
+})
+
+app.get("/note", (req, res) => {
+    res.sendFile(path.join(__dirname, "/frontend/notes.html"))
+})
+
+app.get("/status", (req, res) => {
+    res.status(200).json({
+        message: messageService
+    })
+})
+
+app.get("/aaa/:signal", (req, res) => {
+    const signal = req.params.signal;
+    messageService = !!parseInt(signal);
+    res.status(200).json({
+        message: `updated status as ${signal}`
+    })
+})
+
+db.sequelize.sync({force: false}).then(() => {
     app.listen(PORT, () => {
         console.log(`app started on port ${PORT}`)
+    })
+    db.messages.destroy({
+        where: {},
+        truncate: true
     })
 });
 //
@@ -46,4 +74,10 @@ async function run() {
     await browser.close();
 }
 
-// setInterval(() => run(), 5000);
+
+setInterval(() => {
+    db.messages.destroy({
+        where: {},
+        truncate: true
+    })
+}, 30000);

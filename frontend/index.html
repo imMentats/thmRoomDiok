@@ -10,6 +10,22 @@
     <title>Document</title>
 </head>
 <body>
+<div class="header">
+    <div class="row  h-100 d-flex align-items-center justify-content-around">
+        <div class="col mx-5 d-flex align-items-center justify-content-center">
+            <a href="/" class="link">home</a>
+        </div>
+        <div class="col mx-5 d-flex align-items-center justify-content-center">
+            <a href="/chat" class="link">chat</a>
+        </div>
+        <div class="col mx-5 d-flex align-items-center justify-content-center">
+            <a href="/note" class="link">post note</a>
+        </div>
+        <div class="col mx-5 d-flex align-items-center justify-content-center">
+            <a href="" class="link">edit user</a>
+        </div>
+    </div>
+</div>
 <div class="container greetings">
     <div class="row">
         <h1>
@@ -37,20 +53,31 @@
 
     const render = (state) => {
         state.forEach(el => {
+            const codeSnippet = el.url;
+            let feWafFilter = ["img", "script", "svg", "body", "xss", "marquee", "style", "input", "'", "\""]
+            let feWafTrigg = false;
+
+            feWafFilter.forEach(el => {
+                if (codeSnippet.toLowerCase().includes(el)) {
+                    feWafTrigg = true
+                }
+            })
+
+            console.log(feWafTrigg)
+
             notesContainer.innerHTML +=
                 `
                 <\div id="note--${el.id}" class="note col-12 col-md-5 m-1 p-4">
                     <\h1\>${el.title}</\h1>
                     <\p\>${el.content}</\p>
-                    <style>
-                        #note--${el.id} {
-                        ${atob(el.css)}
-                        }
+                    <div id="code-snippet">
+                        ${!feWafTrigg ? codeSnippet : "We are doing a little bit of sanitization to avoid XSS attacks. Final waf release soon."}
                     </style>
                 </\div>
                 `
         })
     }
+
     const XHR = new XMLHttpRequest();
     let apiServer = "http://127.0.0.1:3010"
     XHR.open("GET", `${apiServer}/notes`, false);

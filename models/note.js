@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        css: {
+        url: {
             type: DataTypes.STRING,
             allowNull: true
         },
