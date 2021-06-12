@@ -76,6 +76,7 @@
         </div>
         <div class="col-2 text-right">
             <p>${new Date(el.createdAt).toUTCString()}</p>
+            <p>${(el.visited && !el.fromAdmin) ? "reviewed" : ""}</p>
         </div>
     </div>
     <div class="row msg-body ${!el.fromAdmin ? 'justify-content-end' : ''}">

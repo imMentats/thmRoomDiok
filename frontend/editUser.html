@@ -10,6 +10,9 @@
     <title>Document</title>
 </head>
 <body>
+<div class="spinner" id="spinner">
+    <p id="spinnerText"></p>
+</div>
 <div class="header">
     <div class="row  h-100 d-flex align-items-center justify-content-around">
         <div class="col mx-5 d-flex align-items-center justify-content-center">
@@ -26,42 +29,32 @@
         </div>
     </div>
 </div>
-<div class="spinner" id="spinner">
-    <p id="spinnerText"></p>
-</div>
-<div class="container greetings">
+<div class="container">
     <div class="row">
         <h1>
-            Notes
+            Welcome to aaaaaa
         </h1>
     </div>
-    <div class="row">
-        <p>In this page it is possible to store notes for the whole team, which will be stored and <b>made reachable</b>
-            by on
-            the homepage.
-            <br>
-            As talk is cheap, it is possible to embed a code snippet to each note by providing an url of the resource.
-            This is done for internal reasons.
-        </p>
-    </div>
-
-    <form id="form">
-        <div class="row my-5">
-            <input type="text" id="title" placeholder="Insert a title" name="title">
-        </div>
-        <div class="row my-5">
-            <input type="text" id="url" placeholder="Insert a reference url" name="url">
-        </div>
-        <div class="row my-5">
-            <textarea type="text" id="content" placeholder="content" name="content"></textarea>
-        </div>
-        <div class="row my-5">
-            <input type="submit" id="submit" value="Submit">
-        </div>
-    </form>
 </div>
-<div class="container container__notes">
-    <div id="notes" class="row d-flex justify-content-center">
+<div class="container mt-4 container__notes">
+    <div class="row">
+        <h2>Welcome back admin!</h2>
+    </div>
+    <div class="row">
+        <p>Here you can edit the user roles and permissions.</p>
+    </div>
+    <div class="row">
+        <div class="col-4">
+            <form class="w-100 mt-5" action="">
+                <label for="username">Username</label><br>
+                <input class="my-3" type="text" id="username" placeholder="username" name="username">
+                <input type="radio" id="user" name="role" value="user">
+                <p class="mb-0">User</p>
+                <input type="radio" id="admin" name="role" value="admin">
+                <p class="mb-0">Admin</p>
+                <input type="submit" value="Submit">
+            </form>
+        </div>
     </div>
 </div>
 <link href="./scripts/app2.js">
@@ -71,36 +64,50 @@
 <script src="lib/js/bootstrap.bundle.js"></script>
 <script>
 
-    const form = document.getElementById("form");
+    document.querySelector('form').addEventListener('submit', (e) => {
+        e.preventDefault()
+        const data = Object.fromEntries(new FormData(e.target).entries());
+        spinner.classList.add("active")
+        updateRole(data)
 
-    form.addEventListener('submit', event => {
-        event.preventDefault()
-        const data = Object.fromEntries(new FormData(event.target).entries());
-        const XHR = new XMLHttpRequest();
+    });
+
+    let formData = {}
+
+    event.preventDefault()
+
+    spinner.classList.add("active")
+
+    async function updateRole(data) {
         const spinner = document.getElementById("spinner")
         const spinnerText = document.getElementById("spinnerText")
+        const XHR = new XMLHttpRequest();
 
-        spinner.classList.add("active")
-
-        XHR.open("POST", "http://127.0.0.1:3010/note");
+        XHR.open("POST", "http://127.0.0.1:3010/editUser");
         XHR.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
-        XHR.send(JSON.stringify(data))
+        XHR.withCredentials = true
+        let computedData = {
+            username: data.username,
+            admin: (data.role === "admin")
+        }
+        XHR.send(JSON.stringify(computedData))
         XHR.onreadystatechange = function () {
             if (XHR.readyState === 4) {
                 if (XHR.status === 200) {
-                    spinnerText.innerHTML = "Note posted successfully!"
+                    spinnerText.innerHTML = "role updated!"
                     setTimeout(() => {
                         spinner.classList.remove("active")
                     }, 1200)
                 } else {
-                    spinnerText.innerHTML = "something went wrong.."
+                    spinnerText.innerHTML = XHR.response
                     setTimeout(() => {
                         spinner.classList.remove("active")
                     }, 2300)
                 }
             }
         }
-    })
+    }
+
 </script>
 </body>
 </html>
