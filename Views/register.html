@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="style/main.css">
+    <link rel="stylesheet" href="./style/main.css">
     <link rel="stylesheet" href="./lib/css/bootstrap.min.css">
     <title>Document</title>
 </head>
@@ -21,39 +21,35 @@
         <div class="col mx-5 d-flex align-items-center justify-content-center">
             <a href="/note" class="link">post note</a>
         </div>
+        <div class="admin-action col mx-5 d-flex align-items-center justify-content-center">
+            <a href="/editUser" class="link">edit user</a>
+        </div>
         <div class="col mx-5 d-flex align-items-center justify-content-center">
-            <a href="" class="link">edit user</a>
+            <p id="username-container"></p>
         </div>
     </div>
 </div>
 <div class="spinner" id="spinner">
     <p id="spinnerText"></p>
 </div>
-<div class="container greetings">
+<div class="container greetings mt-5">
     <div class="row">
         <h1>
-            Notes
+            Login
         </h1>
     </div>
     <div class="row">
-        <p>In this page it is possible to store notes for the whole team, which will be stored and <b>made reachable</b>
-            by on
-            the homepage.
-            <br>
-            As talk is cheap, it is possible to embed a code snippet to each note by providing an url of the resource.
-            This is done for internal reasons.
+        <p>
+            Login with your own credentials.
         </p>
     </div>
 
     <form id="form">
         <div class="row my-5">
-            <input type="text" id="title" placeholder="Insert a title" name="title">
+            <input type="text" id="username" placeholder="Username" name="username">
         </div>
         <div class="row my-5">
-            <input type="text" id="url" placeholder="Insert a reference url" name="url">
-        </div>
-        <div class="row my-5">
-            <textarea type="text" id="content" placeholder="content" name="content"></textarea>
+            <input type="password" id="password" placeholder="Password" name="password">
         </div>
         <div class="row my-5">
             <input type="submit" id="submit" value="Submit">
@@ -66,34 +62,75 @@
 </div>
 <link href="./scripts/app2.js">
 
-<script src="scripts/app.js"></script>
-<script src="lib/js/bootstrap.min.js"></script>
-<script src="lib/js/bootstrap.bundle.js"></script>
+<script src="./scripts/app.js"></script>
+<script src="./lib/js/bootstrap.min.js"></script>
+<script src="./lib/js/bootstrap.bundle.js"></script>
 <script>
 
     const form = document.getElementById("form");
 
+    // populating the header, i really miss VUE...
+    const parseCookie = (str) => {
+        str = str.split(', ');
+        var result = {};
+        for (var i = 0; i < str.length; i++) {
+            var cur = str[i].split('=');
+            result[cur[0]] = cur[1];
+        }
+        return result;
+    }
+    const getUserData = (token) => {
+        const XHR = new XMLHttpRequest();
+        let apiServer = "http://127.0.0.1:3010"
+        XHR.open("GET", `${apiServer}/userDetails/${token}`, false);
+        try {
+            XHR.send();
+            if (XHR.status === 200) {
+                let userData = JSON.parse(XHR.response)
+                console.log(userData)
+                renderHeader(userData.username)
+            }
+        } catch (err) {
+            alert(err)
+        }
+    }
+    const renderHeader = (username) => {
+        let usernameContainer = document.getElementById("username-container")
+        usernameContainer.innerHTML = username
+    }
+    getUserData(parseCookie(document.cookie).access)
+    // -------------
+
     form.addEventListener('submit', event => {
         event.preventDefault()
         const data = Object.fromEntries(new FormData(event.target).entries());
+        console.log(data)
         const XHR = new XMLHttpRequest();
         const spinner = document.getElementById("spinner")
         const spinnerText = document.getElementById("spinnerText")
 
         spinner.classList.add("active")
 
-        XHR.open("POST", "http://127.0.0.1:3010/note");
+        XHR.open("POST", "http://127.0.0.1:3010/login");
         XHR.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+        XHR.withCredentials = true;
+
         XHR.send(JSON.stringify(data))
         XHR.onreadystatechange = function () {
             if (XHR.readyState === 4) {
                 if (XHR.status === 200) {
-                    spinnerText.innerHTML = "Note posted successfully!"
+                    spinnerText.innerHTML = "Login successfully"
+                    getUserData(parseCookie(document.cookie).access)
                     setTimeout(() => {
                         spinner.classList.remove("active")
                     }, 1200)
+                } else if (XHR.status === 403) {
+                    spinnerText.innerHTML = "Invalid Credentials"
+                    setTimeout(() => {
+                        spinner.classList.remove("active")
+                    }, 2300)
                 } else {
-                    spinnerText.innerHTML = "something went wrong.."
+                    spinnerText.innerHTML = "Something went wrong"
                     setTimeout(() => {
                         spinner.classList.remove("active")
                     }, 2300)

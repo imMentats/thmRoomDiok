@@ -21,8 +21,11 @@
         <div class="col mx-5 d-flex align-items-center justify-content-center">
             <a href="/note" class="link">post note</a>
         </div>
+        <div class="admin-action col mx-5 d-flex align-items-center justify-content-center">
+            <a href="/editUser" class="link">edit user</a>
+        </div>
         <div class="col mx-5 d-flex align-items-center justify-content-center">
-            <a href="" class="link">edit user</a>
+            <p id="username-container"></p>
         </div>
     </div>
 </div>
@@ -49,6 +52,38 @@
 <script src="lib/js/bootstrap.min.js"></script>
 <script src="lib/js/bootstrap.bundle.js"></script>
 <script>
+    // populating the header, i really miss VUE...
+    const parseCookie = (str) => {
+        str = str.split(', ');
+        var result = {};
+        for (var i = 0; i < str.length; i++) {
+            var cur = str[i].split('=');
+            result[cur[0]] = cur[1];
+        }
+        return result;
+    }
+    const getUserData = (token) => {
+        const XHR = new XMLHttpRequest();
+        let apiServer = "http://127.0.0.1:3010"
+        XHR.open("GET", `${apiServer}/userDetails/${token}`, false);
+        try {
+            XHR.send();
+            if (XHR.status === 200) {
+                let userData = JSON.parse(XHR.response)
+                console.log(userData)
+                renderHeader(userData.username)
+            }
+        } catch (err) {
+            alert(err)
+        }
+    }
+    const renderHeader = (username) => {
+        let usernameContainer = document.getElementById("username-container")
+        usernameContainer.innerHTML = username
+    }
+    getUserData(parseCookie(document.cookie).access)
+    // -------------
+
     const notesContainer = document.getElementById("notes");
 
     const render = (state) => {
